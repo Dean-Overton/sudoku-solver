@@ -90,6 +90,7 @@ def get_sudoku_cropped_image_from(raw_image, contour):
         plt.figure()
         plt.imshow(imagewrap)
         plt.show()
+        return imagewrap
 
 
 def sudoku_img_2_array(raw_image):
@@ -99,16 +100,21 @@ def sudoku_img_2_array(raw_image):
 
     processed_image = get_preprocessed_img_from(raw_image)
 
-    contour, hiarachy = get_contours_from(raw_image, processed_image)
+    contour, hiarachy = get_contours_from(
+        raw_image, processed_image, debug=True)
 
-    black_img = np.zeros((450, 450, 3), np.uint8)
+    # su_imagewrap = get_sudoku_cropped_image_from(raw_image, contour)
 
-    get_sudoku_cropped_image_from(raw_image, contour)
+    # sudoku_cell = splitcells(su_imagewrap)
+    # print(len(sudoku_cell))
+    # plt.figure()
+    # plt.imshow(sudoku_cell[1])
+    # plt.show()
 
 
 def main():
     print("Reading the Sudoku puzzle image...")
-    image = cv2.imread('./test-data/puzzle4.jpg')
+    image = cv2.imread('./test-data/puzzle1.jpg')
     array = sudoku_img_2_array(image)
     # sod = util.Sudoku(array)
 

@@ -15,3 +15,8 @@ The program should:
    `pip install -r requirements.txt`
 3. Run the program using the following command:
    `python main.py`
+
+### Testing
+
+In order to test the program, you should download a test dataset in the `Data/` folder. This will NOT be pushed to the github.
+[1 Million Sudoku Dataset](https://www.kaggle.com/datasets/bryanpark/sudoku?resource=download)

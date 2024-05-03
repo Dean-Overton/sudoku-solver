@@ -25,7 +25,6 @@ def main_outline(contour):
     max_area = 0
     for i in contour:
         area = cv2.contourArea(i)
-        print(area)
         if area > 50:
             peri = cv2.arcLength(i, True)
             approx = cv2.approxPolyDP(i, 0.02 * peri, True)
@@ -103,18 +102,18 @@ def sudoku_img_2_array(raw_image):
     contour, hiarachy = get_contours_from(
         raw_image, processed_image, debug=True)
 
-    # su_imagewrap = get_sudoku_cropped_image_from(raw_image, contour)
+    su_imagewrap = get_sudoku_cropped_image_from(raw_image, contour)
 
-    # sudoku_cell = splitcells(su_imagewrap)
-    # print(len(sudoku_cell))
-    # plt.figure()
-    # plt.imshow(sudoku_cell[1])
-    # plt.show()
+    sudoku_cells = splitcells(su_imagewrap)
+    # Let's have alook at the last cell
+    plt.figure()
+    plt.imshow(sudoku_cells[0])
+    plt.show()
 
 
 def main():
     print("Reading the Sudoku puzzle image...")
-    image = cv2.imread('./test-data/puzzle1.jpg')
+    image = cv2.imread('./test-data/puzzle2.jpg')
     array = sudoku_img_2_array(image)
     # sod = util.Sudoku(array)
 

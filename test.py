@@ -24,7 +24,7 @@ def main():
             incorrect_solutions += 1
 
         # TODO: MAC support
-        os.system('cls')
+        # os.system('cls')
         print(f"""Solved: {index+1},\n
 solutions correct:{correct_solutions}/{index + 1},\n
 running accuracy: {correct_solutions / (index + 1) * 100:.2f}%

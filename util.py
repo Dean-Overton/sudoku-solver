@@ -65,13 +65,46 @@ class Sudoku:
             not self._check_col_for_number(col, num) and \
             not self._check_matrix_for_number(num, grid_x, grid_y)
 
-    def solve(self):
-        # TODO: Implement the Sudoku puzzle solving algorithm
+    def backtracking_solve(self, row=0, column=0):
+        """Backtracking algorithm that recursively solves a soduku starting
+        branching from values placed from top left to bottom right."""
 
+        if row == 8 and column == 9:
+            # If we reach the end of the board, we have solved the puzzle
+            return True
+
+        if column == 9:
+            # Move to next row if at the end of the column
+            row += 1
+            column = 0
+
+        if self.board[row, column] > 0:
+            # Skip filled cells
+            return self.backtracking_solve(row, column + 1)
+
+        grid_x = column // 3
+        grid_y = row // 3
+
+        for num in range(1, 10):
+            # Place values that are safe/valid only
+            if self._is_safe(grid_x, grid_y, row, column, num):
+                self.board[row, column] = num
+
+                # Try solving the next cell/cells after placeing this value
+                if self.backtracking_solve(row, column + 1):
+                    return True
+
+                self.board[row, column] = 0
+
+        return False
+
+    def solve(self):
+        # Backtracking algorithm to solve the sudoku
+        self.backtracking_solve()
+
+        # FINAL CHECK
         result = self._check_sudoku()
         print(f"Result can solve sudoku: {result}")
-        # if result:
-        print(self.board)
         return self.board
 
     def show(self):

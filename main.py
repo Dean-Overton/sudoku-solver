@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import pytesseract
+from PIL import Image, ImageEnhance
 
 
 def get_preprocessed_img_from(image: cv2.imread):
@@ -36,13 +37,14 @@ def main_outline(contour):
     return biggest, max_area
 
 
-def splitcells(img):
+def get_cell_array_from_img(img):
     rows = np.vsplit(img, 9)
     boxes = []
     for r in rows:
         cols = np.hsplit(r, 9)
-    for box in cols:
-        boxes.append(box)
+
+        for box in cols:
+            boxes.append(box)
     return boxes
 
 
@@ -86,10 +88,25 @@ def get_sudoku_cropped_image_from(raw_image, contour):
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
         imagewrap = cv2.warpPerspective(raw_image, matrix, (450, 450))
         imagewrap = cv2.cvtColor(imagewrap, cv2.COLOR_BGR2GRAY)
-        plt.figure()
-        plt.imshow(imagewrap)
-        plt.show()
         return imagewrap
+
+
+def get_cropped_cells_from_array(cells):
+    Cells_croped = []
+    for image in cells:
+        img = np.array(image)
+        img = img[4:46, 6:46]
+        img = Image.fromarray(img)
+        enhancer = ImageEnhance.Contrast(img)
+        # Increase the contrast by a factor of 2
+        enhanced_img = enhancer.enhance(3.0)
+
+        # Convert the image to grayscale
+        bw_img = enhanced_img.convert('L')
+
+        Cells_croped.append(bw_img)
+
+    return Cells_croped
 
 
 def sudoku_img_2_array(raw_image):
@@ -100,21 +117,44 @@ def sudoku_img_2_array(raw_image):
     processed_image = get_preprocessed_img_from(raw_image)
 
     contour, hiarachy = get_contours_from(
-        raw_image, processed_image, debug=True)
+        raw_image, processed_image, debug=False)
 
-    su_imagewrap = get_sudoku_cropped_image_from(raw_image, contour)
+    su_cropped = get_sudoku_cropped_image_from(raw_image, contour)
 
-    sudoku_cells = splitcells(su_imagewrap)
-    # Let's have alook at the last cell
-    plt.figure()
-    plt.imshow(sudoku_cells[0])
-    plt.show()
+    sudoku_cells = get_cell_array_from_img(su_cropped)
+    sudoku_cells_cropped = get_cropped_cells_from_array(sudoku_cells)
+
+    # Extract the numbers from the cells
+    su_arr = []
+    for row in range(0, 9):
+        row_arr = []
+        for col in range(0, 9):
+            row_arr.append(pytesseract.image_to_string(
+                sudoku_cells_cropped[row * 9 + col],
+                lang='eng',
+                config='--psm 10 --oem 3 -c \
+                tessedit_char_whitelist=0123456789')
+            )
+
+        su_arr.append(row_arr)
+
+    # Clean the array
+    for i in range(0, 9):
+        for j in range(0, 9):
+            if su_arr[i][j] == '':
+                su_arr[i][j] = 0
+            else:
+                su_arr[i][j] = int(su_arr[i][j])
+
+    return su_arr
 
 
 def main():
     print("Reading the Sudoku puzzle image...")
     image = cv2.imread('./test-data/puzzle2.jpg')
     array = sudoku_img_2_array(image)
+    array = np.matrix(array)
+    print(array)
     # sod = util.Sudoku(array)
 
     print("Solving the Sudoku puzzle...")

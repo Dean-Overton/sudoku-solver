@@ -99,7 +99,7 @@ def get_cropped_cells_from_array(cells):
         img = Image.fromarray(img)
         enhancer = ImageEnhance.Contrast(img)
         # Increase the contrast by a factor of 2
-        enhanced_img = enhancer.enhance(3.0)
+        enhanced_img = enhancer.enhance(2.0)
 
         # Convert the image to grayscale
         bw_img = enhanced_img.convert('L')
@@ -124,11 +124,22 @@ def sudoku_img_2_array(raw_image):
     sudoku_cells = get_cell_array_from_img(su_cropped)
     sudoku_cells_cropped = get_cropped_cells_from_array(sudoku_cells)
 
+    # Show specific cell
+    # img = sudoku_cells_cropped[45]
+    # img.show()
+
     # Extract the numbers from the cells
     su_arr = []
     for row in range(0, 9):
         row_arr = []
         for col in range(0, 9):
+            # PSM 10: Find single character. Can miss some characters Eg 9.
+
+            # PSM 6: Assume a single uniform block of text. Can miss interpret
+            # but picks up more values
+
+            # Oem 3: Default OCR Engine Mode.
+
             row_arr.append(pytesseract.image_to_string(
                 sudoku_cells_cropped[row * 9 + col],
                 lang='eng',

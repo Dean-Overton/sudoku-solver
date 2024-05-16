@@ -58,6 +58,8 @@ class Sudoku:
                             y_matrix):
                         return False
 
+        return True
+
     def _is_safe(self, grid_x, grid_y, row, col, num):
         """Check if it is safe to place the number in the cell"""
         # Runtime complexity: O(N^2) where N is the size of the board (9x9)

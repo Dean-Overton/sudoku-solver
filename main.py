@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pytesseract
 from PIL import Image, ImageEnhance
+import time
 
 
 def get_preprocessed_img_from(image: cv2.imread):
@@ -112,6 +113,7 @@ def get_cropped_cells_from_array(cells):
 def sudoku_img_2_array(raw_image):
     """This function extracts the sudoku puzzle from the image and converts it\
     to a 2D array."""
+    start_time = time.time()
     raw_image = cv2.resize(raw_image, (450, 450))
 
     processed_image = get_preprocessed_img_from(raw_image)
@@ -149,6 +151,8 @@ def sudoku_img_2_array(raw_image):
 
         su_arr.append(row_arr)
 
+    print(f"Time taken to detect sudoku: {time.time() - start_time}")
+
     # Clean the array
     for i in range(0, 9):
         for j in range(0, 9):
@@ -162,17 +166,19 @@ def sudoku_img_2_array(raw_image):
 
 def main():
     print("Reading the Sudoku puzzle image...")
-    image = cv2.imread('./test-data/puzzle2.jpg')
+    image = cv2.imread('./test-data/puzzle1.jpg')
     array = sudoku_img_2_array(image)
     array = np.matrix(array)
-    print(array)
-    # sod = util.Sudoku(array)
+
+    sod = util.Sudoku(array)
 
     print("Solving the Sudoku puzzle...")
-    # sod.solve()
+    start_time = time.time()
+    sod.solve()
+    print(f"Time taken to solve sudoku: {time.time() - start_time}")
 
     print("Solved Sudoku:")
-    # sod.show()
+    sod.show()
 
 
 if __name__ == "__main__":

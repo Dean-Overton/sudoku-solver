@@ -19,6 +19,10 @@ def get_preprocessed_img_from(image: cv2.imread):
     # Apply adaptive thresholding to binarize the image
     thresh = cv2.adaptiveThreshold(blur, 255, 1, 1, 11, 2)
 
+    cv2.imwrite('./CompVision/gray.jpg', gray)
+    cv2.imwrite('./CompVision/blur.jpg', blur)
+    cv2.imwrite('./CompVision/thresh.jpg', thresh)
+
     return thresh
 
 
@@ -63,7 +67,7 @@ def reframe(points):
 
 def get_contours_from(raw_image, image, debug=False):
     """This function extracts contours from the image."""
-    contour_1 = raw_image.copy()
+    contour_1 = image.copy()
     contour, hierarchy = cv2.findContours(
         image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cv2.drawContours(contour_1, contour, -1, (0, 255, 0), 3)
@@ -71,6 +75,8 @@ def get_contours_from(raw_image, image, debug=False):
     if debug:
         plt.figure()
         plt.imshow(contour_1)
+        # save the image
+        cv2.imwrite('./CompVision/contour.jpg', contour_1)
         plt.show()
 
     return contour, hierarchy
@@ -105,6 +111,9 @@ def get_cropped_cells_from_array(cells):
         # Convert the image to grayscale
         bw_img = enhanced_img.convert('L')
 
+        # Invert the image
+        # bw_img = Image.fromarray(np.invert(np.array(bw_img)))
+
         Cells_croped.append(bw_img)
 
     return Cells_croped
@@ -114,21 +123,23 @@ def sudoku_img_2_array(raw_image):
     """This function extracts the sudoku puzzle from the image and converts it\
     to a 2D array."""
     start_time = time.time()
-    raw_image = cv2.resize(raw_image, (450, 450))
 
+    raw_image = cv2.resize(raw_image, (450, 450))
     processed_image = get_preprocessed_img_from(raw_image)
 
     contour, hiarachy = get_contours_from(
         raw_image, processed_image, debug=False)
 
     su_cropped = get_sudoku_cropped_image_from(raw_image, contour)
+    cv2.imwrite('./CompVision/su_cropped.jpg', su_cropped)
 
     sudoku_cells = get_cell_array_from_img(su_cropped)
     sudoku_cells_cropped = get_cropped_cells_from_array(sudoku_cells)
 
     # Show specific cell
-    # img = sudoku_cells_cropped[45]
-    # img.show()
+    img = sudoku_cells_cropped[1]
+    # save the image
+    cv2.imwrite('./CompVision/cell.jpg', np.array(img))
 
     # Extract the numbers from the cells
     su_arr = []
@@ -153,20 +164,35 @@ def sudoku_img_2_array(raw_image):
 
     print(f"Time taken to detect sudoku: {time.time() - start_time}")
 
+    # Plot all cells in a grid for debugging
+    fig, axs = plt.subplots(9, 9)
+    for i in range(9):
+        for j in range(9):
+            axs[i, j].imshow(sudoku_cells_cropped[i * 9 + j], cmap='gray')
+            axs[i, j].axis('off')
+    plt.show()
+
     # Clean the array
+    # Convert empty strings to 0
+    # Strip 1 from multiple characters (usually a border detected as 1)
     for i in range(0, 9):
         for j in range(0, 9):
+            su_arr[i][j] = su_arr[i][j].replace('\n', '')
             if su_arr[i][j] == '':
                 su_arr[i][j] = 0
             else:
-                su_arr[i][j] = int(su_arr[i][j])
+                if len(su_arr[i][j]) > 1:
+                    print(f"Detected multiple characters: {su_arr[i][j]}")
+                    su_arr[i][j] = int(su_arr[i][j].replace('1', ''))
+                else:
+                    su_arr[i][j] = int(su_arr[i][j])
 
     return su_arr
 
 
 def main():
     print("Reading the Sudoku puzzle image...")
-    image = cv2.imread('./test-data/puzzle1.jpg')
+    image = cv2.imread('./test-data/puzzle2.jpg')
     array = sudoku_img_2_array(image)
     array = np.matrix(array)
 

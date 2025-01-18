@@ -6,7 +6,7 @@ from .forms import UploadForm
 def process_file(file_path):
     # Python function to process the file
     # Replace this with your custom logic
-    with open(file_path, 'r') as f:
+    with open(file_path, mode='rb') as f:
         data = f.read()
     return f"File processed with {len(data)} characters."
 

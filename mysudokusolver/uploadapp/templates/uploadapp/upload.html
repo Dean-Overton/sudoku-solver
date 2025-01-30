@@ -45,7 +45,10 @@
                             <img id="imagePreview" src="#" alt="Image Preview" class="img-thumbnail d-none">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Solve!</button>
+                    <button id="taskButton" type="submit" class="btn btn-primary w-100">
+                        <span id="buttonText">Solve</span>
+                        <span id="loadingIcon" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
                 </form>
             </div>
         </div>
@@ -80,8 +83,41 @@
                     event.stopPropagation()
                 }
                 form.classList.add('was-validated')
+                
+                // let button = document.getElementById("taskButton");
+                // let buttonText = document.getElementById("buttonText");
+                // let loadingIcon = document.getElementById("loadingIcon");
+
+                // // Change button state
+                // buttonText.innerText = "Processing...";
+                // loadingIcon.classList.remove("d-none");
+                // button.disabled = true;
+
+                // // Start the task
+                // fetch('/start_task/')
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         const taskId = data.task_id;
+                //         checkTaskStatus(taskId, buttonText, loadingIcon, button);
+                //     });
             }, false)
         })
-    })()
+    })();
+    // function checkTaskStatus(taskId, buttonText, loadingIcon, button) {
+    //     fetch(`/get_task_status/${taskId}/`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.state === "PROGRESS") {
+    //                 buttonText.innerText = `Processing... ${data.current}`;
+    //                 setTimeout(() => checkTaskStatus(taskId, buttonText, loadingIcon, button), 1000);
+    //             } else {
+    //                 buttonText.innerText = "Done!";
+    //                 loadingIcon.classList.add("d-none");
+    //                 button.classList.remove("btn-primary");
+    //                 button.classList.add("btn-success");
+    //                 button.disabled = false; // Re-enable button if needed
+    //             }
+    //         });
+    // }
 </script>
 </html>

@@ -107,8 +107,8 @@ class Sudoku:
         self.backtracking_solve()
 
         # FINAL CHECK
-        result = self._check_sudoku()
-        print(f"Result can solve sudoku: {result}")
+        self.result = self._check_sudoku()
+        print(f"Result can solve sudoku: {self.result}")
         return self.board
 
     def show(self):
@@ -281,21 +281,25 @@ def sudoku_arr_superimpose_img(
     original_image = cv2.resize(original_image, (450, 450))
 
     # Clean solution array by removing original values
-    print("Og Board:")
-    print(original_board)
     for i in range(9):
         for j in range(9):
             if original_board[i, j] != 0:
                 solution[i, j] = 0
-
-    print("Solution:")
-    print(solution)
 
     # Create solution image
     solution_image = np.zeros((450, 450, 4), dtype=np.uint8)
     for i in range(9):
         for j in range(9):
             if solution[i, j] != 0:
+                # Draw white rectangle as background for text
+                cv2.rectangle(
+                    solution_image,
+                    (j * 50 + 15, i * 50 + 10),
+                    (j * 50 + 40, i * 50 + 40),
+                    (255, 255, 255, 255),
+                    -1
+                )
+                # Draw the text on top of the white rectangle
                 cv2.putText(
                     solution_image,
                     str(solution[i, j]),
@@ -342,10 +346,10 @@ def sudoku_arr_superimpose_img(
     blended = (foreground_bgr * alpha + original_image *
                (1 - alpha)).astype(np.uint8)
 
-    cv2.imshow("Blended", foreground_bgr)
-    cv2.imshow("Original", original_image)
-    cv2.imshow("Solution", imagewrap)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Blended", blended)
+    # cv2.imshow("Original", original_image)
+    # cv2.imshow("Solution", imagewrap)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     return blended

@@ -1,0 +1,6 @@
+media
+
+db.sqlite3
+
+# Python cache
+__pycache__/

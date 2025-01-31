@@ -46,6 +46,7 @@ def process_file(fs, file, file_path):
         solution_PIL.save(processed_file_path)
     return {
         "file_name": processed_file_path,
+        "solved": sod.result,
         "time_to_solve": tts
     }
 
@@ -62,15 +63,26 @@ def upload_view(request):
             # Solve the sudoku
             result = process_file(fs, file, file_path)
 
-            return render(
-                request,
-                'uploadapp/result.html',
-                {
-                    'original_image_url': fs.url(file),
-                    'processed_image_url': fs.url(result['file_name']),
-                    'time_to_solve': result['time_to_solve']
-                }
-            )
+            if result['solved']:
+                return render(
+                    request,
+                    'uploadapp/result.html',
+                    {
+                        'original_image_url': fs.url(file),
+                        'processed_image_url': fs.url(result['file_name']),
+                        'time_to_solve': result['time_to_solve']
+                    }
+                )
+            else:
+                return render(
+                    request,
+                    'uploadapp/error.html',
+                    {
+                        'original_image_url': fs.url(file),
+                        'error_message': "This Sudoku puzzle could not be read. :( Maybe try another one?",
+                        'error_summary': "Error reading Sudoku puzzle"
+                    }
+                )
 
     else:
         upload_form = UploadForm()
